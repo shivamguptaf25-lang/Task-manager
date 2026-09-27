@@ -1,0 +1,33 @@
+function FilterBar({ statusFilter, onStatusChange, categoryFilter, onCategoryChange }) {
+  const statuses = ["All", "Active", "Completed"];
+  const categories = ["All", "Work", "Personal", "Urgent"];
+
+  return (
+    <div className="filter-bar">
+      <div className="filter-group">
+        {statuses.map((status) => (
+          <button
+            key={status}
+            onClick={() => onStatusChange(status)}
+            className={`filter-button ${statusFilter === status ? "active" : ""}`}
+          >
+            {status}
+          </button>
+        ))}
+      </div>
+      <select
+        value={categoryFilter}
+        onChange={(e) => onCategoryChange(e.target.value)}
+        className="category-select"
+      >
+        {categories.map((category) => (
+          <option key={category} value={category}>
+            {category}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+export default FilterBar;
