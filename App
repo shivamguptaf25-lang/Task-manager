@@ -1,0 +1,85 @@
+import { useState } from "react";
+import useLocalStorage from "./hooks/useLocalStorage.js";
+import TaskForm from "./components/TaskForm.jsx";
+import TaskList from "./components/TaskList.jsx";
+import FilterBar from "./components/FilterBar.jsx";
+import TaskStats from "./components/TaskStats.jsx";
+
+function App() {
+  const [tasks, setTasks] = useLocalStorage("tasks", []);
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+
+  function addTask(text, category) {
+    const newTask = {
+      id: crypto.randomUUID(),
+      text,
+      category,
+      completed: false
+    };
+    setTasks([newTask, ...tasks]);
+  }
+
+  function toggleComplete(id) {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  }
+
+  function deleteTask(id) {
+    setTasks(tasks.filter((task) => task.id !== id));
+  }
+
+  function editTask(id, newText, newCategory) {
+    setTasks(
+      tasks.map((task) =>
+        task.id === id ? { ...task, text: newText, category: newCategory } : task
+      )
+    );
+  }
+
+  const filteredTasks = tasks.filter((task) => {
+    const statusMatch =
+      statusFilter === "All" ||
+      (statusFilter === "Active" && !task.completed) ||
+      (statusFilter === "Completed" && task.completed);
+
+    const categoryMatch =
+      categoryFilter === "All" || task.category === categoryFilter;
+
+    return statusMatch && categoryMatch;
+  });
+
+  return (
+    <div className="app">
+      <header className="app-header">
+        <h1>Task Manager</h1>
+        <p>Stay organized, one task at a time.</p>
+      </header>
+
+      <main className="app-main">
+        <TaskForm onAddTask={addTask} />
+
+        <TaskStats tasks={tasks} />
+
+        <FilterBar
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          categoryFilter={categoryFilter}
+          onCategoryChange={setCategoryFilter}
+        />
+
+        <TaskList
+          tasks={filteredTasks}
+          onToggleComplete={toggleComplete}
+          onDeleteTask={deleteTask}
+          onEditTask={editTask}
+        />
+      </main>
+    </div>
+  );
+}
+
+export default App;
