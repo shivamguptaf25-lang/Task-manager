@@ -1,0 +1,78 @@
+import { useState } from "react";
+
+function TaskItem({ task, onToggleComplete, onDeleteTask, onEditTask }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(task.text);
+  const [editCategory, setEditCategory] = useState(task.category);
+
+  function handleSave() {
+    const trimmed = editText.trim();
+    if (trimmed === "") {
+      return;
+    }
+    onEditTask(task.id, trimmed, editCategory);
+    setIsEditing(false);
+  }
+
+  function handleCancel() {
+    setEditText(task.text);
+    setEditCategory(task.category);
+    setIsEditing(false);
+  }
+
+  if (isEditing) {
+    return (
+      <li className="task-item editing">
+        <input
+          type="text"
+          value={editText}
+          onChange={(e) => setEditText(e.target.value)}
+          className="edit-input"
+        />
+        <select
+          value={editCategory}
+          onChange={(e) => setEditCategory(e.target.value)}
+          className="category-select"
+        >
+          <option value="Work">Work</option>
+          <option value="Personal">Personal</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+        <div className="task-actions">
+          <button onClick={handleSave} className="save-button">
+            Save
+          </button>
+          <button onClick={handleCancel} className="cancel-button">
+            Cancel
+          </button>
+        </div>
+      </li>
+    );
+  }
+
+  return (
+    <li className={`task-item ${task.completed ? "completed" : ""}`}>
+      <label className="task-label">
+        <input
+          type="checkbox"
+          checked={task.completed}
+          onChange={() => onToggleComplete(task.id)}
+        />
+        <span className="task-text">{task.text}</span>
+      </label>
+      <span className={`category-tag category-${task.category.toLowerCase()}`}>
+        {task.category}
+      </span>
+      <div className="task-actions">
+        <button onClick={() => setIsEditing(true)} className="edit-button">
+          Edit
+        </button>
+        <button onClick={() => onDeleteTask(task.id)} className="delete-button">
+          Delete
+        </button>
+      </div>
+    </li>
+  );
+}
+
+export default TaskItem;
